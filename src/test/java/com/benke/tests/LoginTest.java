@@ -2,6 +2,7 @@ package com.benke.tests;
 
 import com.benke.base.BaseTest;
 import com.benke.pages.BasePage;
+import com.benke.pages.HomePage;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -9,10 +10,11 @@ public class LoginTest extends BaseTest {
 
     @Test
     public void verifySeleniumWebsiteTitle() {
-        BasePage basePage = new BasePage(driver);
-        basePage.openUrl("https://www.selenium.dev/");
+        HomePage homePage = new HomePage(driver);
 
-        String actualTitle = driver.getTitle();
+        homePage.open();
+
+        String actualTitle = homePage.getPageTitle();
 
         Assert.assertTrue(
                 actualTitle.contains("Selenium"),
