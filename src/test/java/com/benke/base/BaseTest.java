@@ -1,4 +1,3 @@
-
 package com.benke.base;
 
 import org.openqa.selenium.WebDriver;
@@ -25,8 +24,14 @@ public class BaseTest {
 
     @AfterMethod(alwaysRun = true)
     public void tearDown() {
+        System.out.println("2 - BaseTest closing browser");
+
         if (driver != null) {
-            driver.quit();
+            try {
+                driver.quit();
+            } finally {
+                driver = null;
+            }
         }
     }
 }
