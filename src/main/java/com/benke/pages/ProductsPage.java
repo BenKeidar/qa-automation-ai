@@ -8,11 +8,9 @@ import java.util.List;
 
 public class ProductsPage extends BasePage {
 
-    private static final String URL =
-            "https://automationexercise.com/products";
+    private static final String URL = "https://automationexercise.com/products";
 
-    private final By productsList =
-            By.cssSelector(".features_items .product-image-wrapper");
+    private final By productsList = By.cssSelector(".features_items .product-image-wrapper");
 
     public ProductsPage(WebDriver driver) {
         super(driver);
@@ -23,8 +21,7 @@ public class ProductsPage extends BasePage {
     }
 
     public boolean areProductsDisplayed() {
-        List<WebElement> products = driver.findElements(productsList);
-        return !products.isEmpty();
+        return waitForVisible(productsList).isDisplayed();
     }
 
     public int getProductsCount() {

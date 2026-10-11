@@ -46,4 +46,9 @@ public class ScreenshotListener implements ITestListener {
             );
         }
     }
+
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        System.out.println("PASSED: " + result.getName());
+    }
 }
