@@ -1,15 +1,14 @@
 package com.benke.tests;
 
 import com.benke.base.BaseTest;
-import com.benke.pages.BasePage;
 import com.benke.pages.HomePage;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class LoginTest extends BaseTest {
+public class VerifyHomePageTitleTest extends BaseTest {
 
     @Test
-    public void verifySeleniumWebsiteTitle() {
+    void verifyHomePageTitle() {
         HomePage homePage = new HomePage(driver);
 
         homePage.open();
@@ -17,8 +16,9 @@ public class LoginTest extends BaseTest {
         String actualTitle = homePage.getPageTitle();
 
         Assert.assertTrue(
-                actualTitle.contains("Selenium"),
-                "Page title does not contain 'Selenium'"
+                actualTitle.contains("Automation Exercise"),
+                "Home page title does not contain 'Automation Exercise'. Actual title: "
+                        + actualTitle
         );
     }
 }
