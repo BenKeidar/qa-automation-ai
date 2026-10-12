@@ -1,4 +1,3 @@
-
 package com.benke.pages;
 
 import org.openqa.selenium.By;
@@ -23,9 +22,6 @@ public class LoginPage extends BasePage {
     private final By loginError =
             By.xpath("//p[contains(text(),'Your email or password is incorrect!')]");
 
-    private final By loggedInUser =
-            By.xpath("//a[contains(., 'Logged in as')]");
-
     public LoginPage(WebDriver driver) {
         super(driver);
     }
@@ -46,13 +42,14 @@ public class LoginPage extends BasePage {
         return waitForVisible(loginError).getText();
     }
 
-    public boolean waitUntilUserLoggedIn() {
+    public boolean waitUntilUserLoggedOut() {
         try {
             return wait.until(
                     ExpectedConditions.visibilityOfElementLocated(
-                            loggedInUser
+                            By.cssSelector("input[data-qa='login-email']")
                     )
             ).isDisplayed();
+
         } catch (TimeoutException e) {
             return false;
         }

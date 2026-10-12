@@ -53,9 +53,6 @@ public class SignupPage extends BasePage {
     private final By accountDeletedHeading =
             By.cssSelector("[data-qa='account-deleted']");
 
-    private final By loggedInUser =
-            By.xpath("//a[contains(., 'Logged in as')]");
-
     public SignupPage(WebDriver driver) {
         super(driver);
     }
@@ -145,31 +142,13 @@ public class SignupPage extends BasePage {
         return waitForVisible(accountDeletedHeading).isDisplayed();
     }
 
-    public boolean isUserLoggedIn() {
-        return !driver.findElements(loggedInUser).isEmpty()
-                && driver.findElement(loggedInUser).isDisplayed();
-    }
-
-
-    public boolean waitUntilUserLoggedIn() {
-        try {
-            return wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(
-                            loggedInUser
-                    )
-            ).isDisplayed();
-
-        } catch (TimeoutException e) {
-            return false;
-        }
-    }
-
-
     public boolean waitForRegistrationResult() {
+        HomePage homePage = new HomePage(driver);
+
         try {
             return wait.until(d ->
                     isAccountCreatedPageDisplayed()
-                            || isUserLoggedIn()
+                            || homePage.isUserLoggedIn()
             );
         } catch (TimeoutException e) {
             return false;

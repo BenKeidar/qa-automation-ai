@@ -2,6 +2,7 @@
 package com.benke.tests;
 
 import com.benke.base.BaseTest;
+import com.benke.pages.HomePage;
 import com.benke.pages.LoginPage;
 import com.benke.pages.SignupPage;
 import io.qameta.allure.Allure;
@@ -15,6 +16,7 @@ public class SignupTest extends BaseTest {
 
     private SignupPage signupPage;
     private LoginPage loginPage;
+    private HomePage homePage;
     private boolean registrationSubmitted;
     private String testEmail;
     private String testPassword;
@@ -25,6 +27,7 @@ public class SignupTest extends BaseTest {
         registrationSubmitted = false;
         signupPage = new SignupPage(driver);
         loginPage = new LoginPage(driver);
+        homePage = new HomePage(driver);
 
         String name = "Automation Tester";
         testEmail = "qa.test." +
@@ -69,7 +72,7 @@ public class SignupTest extends BaseTest {
             signupPage.dismissAdIfPresent();
 
             Assert.assertTrue(
-                    signupPage.waitUntilUserLoggedIn(),
+                    homePage.waitUntilUserLoggedIn(),
                     "User is not logged in after registration"
             );
         });
@@ -93,13 +96,13 @@ public class SignupTest extends BaseTest {
                 signupPage.continueAfterRegistration();
             }
 
-            if (!signupPage.isUserLoggedIn()) {
+            if (!homePage.isUserLoggedIn()) {
                 loginPage.open();
                 loginPage.login(testEmail, testPassword);
             }
 
             Assert.assertTrue(
-                    loginPage.waitUntilUserLoggedIn(),
+                    homePage.waitUntilUserLoggedIn(),
                     "Cleanup failed: Could not log in as test user"
             );
         });
