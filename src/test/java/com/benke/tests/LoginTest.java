@@ -4,14 +4,15 @@ import com.benke.base.BaseTest;
 import com.benke.pages.HomePage;
 import com.benke.pages.LoginPage;
 import io.qameta.allure.Allure;
+import io.qameta.allure.Description;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.annotations.DataProvider;
 
 public class LoginTest  extends BaseTest {
 
-    @DataProvider(name = "invalidLoginData")
-    public Object[][] invalidLoginData() {
+    @DataProvider(name = "invalidCredentials")
+    public Object[][] invalidCredentials() {
         return new Object[][] {
                 {"unknown@example.com", "wrongPassword123"},
                 {"invalid-user@example.com", "incorrectPass456"},
@@ -19,7 +20,11 @@ public class LoginTest  extends BaseTest {
         };
     }
 
-    @Test(dataProvider = "invalidLoginData")
+    @Test(dataProvider = "invalidCredentials")
+    @Description(
+            "Verifies that login attempts with invalid credentials " +
+                    "are rejected and an appropriate error message is displayed."
+    )
     public void loginWithInvalidCredentialsShouldShowError(
             String email,
             String password
@@ -44,6 +49,10 @@ public class LoginTest  extends BaseTest {
 
 
     @Test
+    @Description(
+            "Verifies that a registered user can log in successfully " +
+                    "and log out from the application."
+    )
     public void validLoginAndLogoutShouldSucceed() {
 
         String email = System.getenv("TEST_USER_EMAIL");
@@ -88,6 +97,5 @@ public class LoginTest  extends BaseTest {
                     "User is still logged in after logout"
             );
         });
-
     }
 }

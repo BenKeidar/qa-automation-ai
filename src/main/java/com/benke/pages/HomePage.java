@@ -9,11 +9,11 @@ public class HomePage extends BasePage {
     
     private static final String URL = "https://automationexercise.com/";
 
-    private final By loggedInUser =
-            By.xpath("//a[contains(., 'Logged in as')]");
+    private final By loggedInUser = By.xpath("//a[contains(., 'Logged in as')]");
 
-    private final By logoutButton =
-            By.cssSelector("a[href='/logout']");
+    private final By logoutButton = By.cssSelector("a[href='/logout']");
+
+    private final By cartHeaderLink = By.cssSelector("a[href='/view_cart']");
 
     public HomePage(WebDriver driver) {
         super(driver);
@@ -48,5 +48,10 @@ public class HomePage extends BasePage {
 
     public void logout() {
         click(logoutButton);
+    }
+
+    public CartPage openCartFromHeader() {
+        click(cartHeaderLink);
+        return new CartPage(driver);
     }
 }

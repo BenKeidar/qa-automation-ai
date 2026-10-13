@@ -4,12 +4,18 @@ package com.benke.tests;
 import com.benke.base.BaseTest;
 import com.benke.pages.ProductsPage;
 import io.qameta.allure.Allure;
+import io.qameta.allure.Description;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class SearchProductTest extends BaseTest {
 
     @Test
+    @Description(
+            "Verifies that searching for a product displays the " +
+                    "Searched Products section and returns results containing " +
+                    "at least one product matching the search keyword."
+    )
     public void searchProductShouldReturnMatchingResults() {
 
         ProductsPage productsPage = new ProductsPage(driver);

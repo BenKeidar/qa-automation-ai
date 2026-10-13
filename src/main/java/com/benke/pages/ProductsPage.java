@@ -26,6 +26,9 @@ public class ProductsPage extends BasePage {
     private final By viewCartLink =
             By.cssSelector("#cartModal a[href='/view_cart']");
 
+    private final By continueShoppingButton =
+            By.cssSelector("#cartModal button.close-modal");
+
     public ProductsPage(WebDriver driver) {
         super(driver);
     }
@@ -86,6 +89,20 @@ public class ProductsPage extends BasePage {
         button.click();
     }
 
+    public void addProductMultipleTimes(String productName, int quantity) {
+
+        if (quantity < 1) {
+            throw new IllegalArgumentException(
+                    "Quantity must be greater than zero"
+            );
+        }
+
+        for (int i = 0; i < quantity; i++) {
+            addProductToCart(productName);
+            continueShopping();
+        }
+    }
+
     public String getProductPrice(String productName) {
         By productPrice = By.xpath(
                 "//div[contains(@class,'productinfo')]" +
@@ -94,6 +111,10 @@ public class ProductsPage extends BasePage {
         );
 
         return waitForVisible(productPrice).getText().trim();
+    }
+
+    public void continueShopping() {
+        click(continueShoppingButton);
     }
 
     public CartPage viewCart() {

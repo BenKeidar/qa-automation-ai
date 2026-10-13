@@ -60,4 +60,9 @@ public class CartPage extends BasePage {
                 .trim();
     }
 
+    public int getCartItemsCount() {
+        return driver.findElements(
+                By.cssSelector("#cart_info_table tbody tr")
+        ).size();
+    }
 }

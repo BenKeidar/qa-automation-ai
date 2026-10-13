@@ -6,6 +6,7 @@ import com.benke.pages.HomePage;
 import com.benke.pages.LoginPage;
 import com.benke.pages.SignupPage;
 import io.qameta.allure.Allure;
+import io.qameta.allure.Description;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
@@ -22,6 +23,12 @@ public class SignupTest extends BaseTest {
     private String testPassword;
 
     @Test
+    @Description(
+            "Verifies that a new user can register successfully " +
+                    "using a unique email address, confirms that the account " +
+                    "is created and the user is logged in, and deletes " +
+                    "the test account during cleanup."
+    )
     public void registerNewUserShouldSucceed() {
 
         registrationSubmitted = false;
