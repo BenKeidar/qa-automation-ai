@@ -3,11 +3,26 @@ package com.benke.pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class CartPage extends BasePage {
 
     private final By cartProducts =
             By.cssSelector("#cart_info_table tbody tr");
+
+    private final By removeProductButtons =
+            By.cssSelector(".cart_quantity_delete");
+
+    private final By emptyCartMessage =
+            By.xpath("//*[contains(text(),'Cart is empty!')]");
+
+    private By productRowLocator(String productName) {
+        return By.xpath(
+                "//table[@id='cart_info_table']//tr[" +
+                        ".//td[contains(@class,'cart_description')]" +
+                        "//a[normalize-space()='" + productName + "']]"
+        );
+    }
 
     public CartPage(WebDriver driver) {
         super(driver);
@@ -28,13 +43,7 @@ public class CartPage extends BasePage {
 
 
     private WebElement getProductRow(String productName) {
-        By productRow = By.xpath(
-                "//table[@id='cart_info_table']//tr" +
-                        "[.//td[contains(@class,'cart_description')]" +
-                        "//a[normalize-space()='" + productName + "']]"
-        );
-
-        return waitForVisible(productRow);
+        return waitForVisible(productRowLocator(productName));
     }
 
     public int getProductQuantity(String productName) {
@@ -64,5 +73,23 @@ public class CartPage extends BasePage {
         return driver.findElements(
                 By.cssSelector("#cart_info_table tbody tr")
         ).size();
+    }
+
+    public void removeProduct(String productName) {
+        WebElement productRow = getProductRow(productName);
+
+        productRow.findElement(removeProductButtons).click();
+    }
+
+    public boolean isProductRemoved(String productName) {
+        return wait.until(
+                ExpectedConditions.invisibilityOfElementLocated(
+                        productRowLocator(productName)
+                )
+        );
+    }
+
+    public boolean isCartEmpty() {
+        return waitForVisible(emptyCartMessage).isDisplayed();
     }
 }

@@ -182,4 +182,131 @@ public class AddToCartTest extends BaseTest {
                 price.replaceAll("[^0-9]", "")
         );
     }
+
+
+    @Test
+    @Description(
+            "Adds two different products to the cart, removes Blue Top, " +
+                    "and verifies that only Winter Top remains."
+    )
+    public void removeProductFromCartShouldSucceed() {
+
+        ProductsPage productsPage = new ProductsPage(driver);
+        HomePage homePage = new HomePage(driver);
+
+        String productToRemove = "Blue Top";
+        String productToKeep = "Winter Top";
+
+        Allure.step("Open products page", productsPage::open);
+
+        Allure.step("Search for top", () -> {
+            productsPage.searchProduct("top");
+        });
+
+        String expectedPrice = Allure.step(
+                "Get product price before adding to cart",
+                () -> productsPage.getProductPrice(productToKeep)
+        );
+
+        Allure.step("Add products to cart", () -> {
+            productsPage.addProductMultipleTimes(productToRemove, 1);
+            productsPage.addProductMultipleTimes(productToKeep, 1);
+        });
+
+        CartPage cartPage = Allure.step(
+                "Open cart from header",
+                homePage::openCartFromHeader
+        );
+
+        Allure.step("Verify both products are initially in cart", () -> {
+            Assert.assertTrue(cartPage.isProductInCart(productToRemove));
+            Assert.assertTrue(cartPage.isProductInCart(productToKeep));
+        });
+
+        Allure.step("Remove " + productToRemove, () -> {
+            cartPage.removeProduct(productToRemove);
+        });
+
+        Allure.step("Verify removed product is no longer in cart", () -> {
+            Assert.assertTrue(
+                    cartPage.isProductRemoved(productToRemove),
+                    productToRemove + " is still in cart"
+            );
+        });
+
+        Allure.step("Verify remaining product is still in cart", () -> {
+            Assert.assertTrue(
+                    cartPage.isProductInCart(productToKeep),
+                    productToKeep + " was unexpectedly removed"
+            );
+        });
+
+        Allure.step("Verify cart contains exactly one product", () -> {
+            Assert.assertEquals(
+                    cartPage.getCartItemsCount(),
+                    1,
+                    "Unexpected number of products in cart"
+            );
+        });
+
+        Allure.step("Verify product total price is right", () -> {
+            Assert.assertEquals(
+                    cartPage.getProductTotal(productToKeep),
+                    expectedPrice,
+                    "Incorrect total for quantity 1"
+            );
+        });
+    }
+
+    @Test
+    @Description(
+            "Adds a single product to the cart, removes it, " +
+                    "and verifies that the cart is empty."
+    )
+    public void removingLastProductShouldEmptyCart() {
+
+        ProductsPage productsPage = new ProductsPage(driver);
+        HomePage homePage = new HomePage(driver);
+
+        String productName = "Blue Top";
+
+        Allure.step("Open products page", productsPage::open);
+
+        Allure.step("Search for " + productName, () -> {
+            productsPage.searchProduct(productName);
+        });
+
+        Allure.step("Add product to cart", () -> {
+            productsPage.addProductMultipleTimes(productName, 1);
+        });
+
+        CartPage cartPage = Allure.step(
+                "Open cart from header",
+                homePage::openCartFromHeader
+        );
+
+        Allure.step("Verify product is in cart", () -> {
+            Assert.assertTrue(
+                    cartPage.isProductInCart(productName),
+                    productName + " was not found in cart"
+            );
+        });
+
+        Allure.step("Remove " + productName, () -> {
+            cartPage.removeProduct(productName);
+        });
+
+        Allure.step("Verify cart is empty", () -> {
+            Assert.assertTrue(
+                    cartPage.isCartEmpty(),
+                    "Empty cart message was not displayed"
+            );
+
+            Assert.assertEquals(
+                    cartPage.getCartItemsCount(),
+                    0,
+                    "Cart should contain no products"
+            );
+        });
+    }
 }
