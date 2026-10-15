@@ -1,9 +1,7 @@
 package com.benke.tests;
 
 import com.benke.base.BaseTest;
-import com.benke.pages.CartPage;
-import com.benke.pages.HomePage;
-import com.benke.pages.ProductsPage;
+import com.benke.pages.*;
 import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import org.testng.Assert;
@@ -308,5 +306,173 @@ public class AddToCartTest extends BaseTest {
                     "Cart should contain no products"
             );
         });
+    }
+
+    @Test
+    @Description(
+            "Verifies that a guest user attempting to proceed to checkout " +
+                    "is prompted to register or log in."
+    )
+    public void checkoutWithoutLoggedUserShouldRequireAuthentication() {
+
+        ProductsPage productsPage = new ProductsPage(driver);
+        HomePage homePage = new HomePage(driver);
+
+        String productName = "Blue Top";
+
+        Allure.step("Open products page", productsPage::open);
+
+        Allure.step("Search for " + productName, () -> {
+            productsPage.searchProduct(productName);
+        });
+
+        Allure.step("Add product to cart", () -> {
+            productsPage.addProductMultipleTimes(productName, 1);
+        });
+
+        CartPage cartPage = Allure.step(
+                "Open cart from header",
+                homePage::openCartFromHeader
+        );
+
+        Allure.step("Verify product is in cart", () -> {
+            Assert.assertTrue(
+                    cartPage.isProductInCart(productName),
+                    productName + " was not found in cart"
+            );
+        });
+
+        Allure.step("Click on checkout", cartPage::proceedToCheckout);
+
+        Allure.step("Verify guest user is prompted to log in or register", () -> {
+            Assert.assertTrue(
+                    cartPage.isLoginRequiredForCheckout(),
+                    "Guest user was not prompted to log in or register"
+            );
+        });
+    }
+
+    @Test
+    @Description(
+            "Verifies that a logged-in user can proceed from the cart " +
+                    "to the checkout page and review the order details."
+    )
+    public void loggedInUserShouldProceedToCheckout() {
+        String email = System.getenv("TEST_USER_EMAIL");
+        String password = System.getenv("TEST_USER_PASSWORD");
+
+        if (email == null || email.isBlank()
+                || password == null || password.isBlank()) {
+            throw new IllegalStateException(
+                    "Missing test user environment variables"
+            );
+        }
+
+        ProductsPage productsPage = new ProductsPage(driver);
+        LoginPage loginPage = new LoginPage(driver);
+        HomePage homePage = new HomePage(driver);
+
+        String productName = "Blue Top";
+
+        Allure.step("Open login page", loginPage::open);
+
+        Allure.step("Login with valid test user", () -> {
+            loginPage.login(email, password);
+        });
+
+        Allure.step("Verify user is logged in", () -> {
+            Assert.assertTrue(
+                    homePage.waitUntilUserLoggedIn(),
+                    "User was not logged in"
+            );
+        });
+
+        cleanTheCart(homePage, productsPage);
+
+        Allure.step("Search for " + productName, () -> {
+            productsPage.searchProduct(productName);
+        });
+
+        String expectedPrice = Allure.step(
+                "Get product price before checkout",
+                () -> productsPage.getProductPrice(productName)
+        );
+
+        Allure.step("Add product to cart", () -> {
+            productsPage.addProductMultipleTimes(productName, 1);
+        });
+
+        CartPage cartPage = Allure.step(
+                "Open cart from header",
+                homePage::openCartFromHeader
+        );
+
+        Allure.step("Verify product is in cart", () -> {
+            Assert.assertTrue(
+                    cartPage.isProductInCart(productName),
+                    productName + " was not found in cart"
+            );
+        });
+
+        CheckoutPage checkoutPage = Allure.step(
+                "Proceed to checkout",
+                cartPage::proceedToCheckout
+        );
+
+        Allure.step("Verify checkout page is displayed", () -> {
+            Assert.assertTrue(
+                    checkoutPage.isAddressDetailsDisplayed(),
+                    "Checkout page was not displayed"
+            );
+        });
+
+        Allure.step("Verify product quantity in checkout", () -> {
+            Assert.assertEquals(
+                    checkoutPage.getOrderItems().getProductQuantity(productName),
+                    1,
+                    "Incorrect product quantity in checkout"
+            );
+        });
+
+        Allure.step("Verify product unit price in checkout", () ->
+                Assert.assertEquals(
+                        checkoutPage.getOrderItems().getProductPrice(productName),
+                        expectedPrice,
+                        "Incorrect product price in checkout"
+                )
+        );
+
+        Allure.step("Verify product total price in checkout", () ->
+                Assert.assertEquals(
+                        checkoutPage.getOrderItems().getProductTotal(productName),
+                        expectedPrice,
+                        "Incorrect product total in checkout"
+                )
+        );
+
+        Allure.step("Verify checkout total amount", () ->
+                Assert.assertEquals(
+                        checkoutPage.getTotalAmount(),
+                        expectedPrice,
+                        "Incorrect checkout total amount"
+                )
+        );
+    }
+
+    public void cleanTheCart(HomePage homePage, ProductsPage productsPage){
+        Allure.step("Ensure cart is empty before test", () -> {
+
+            CartPage cartPage = homePage.openCartFromHeader();
+
+            cartPage.clearCart();
+
+            Assert.assertEquals(
+                    cartPage.getCartItemsCount(),
+                    0,
+                    "Cart was not empty before starting checkout test"
+            );
+        });
+
+        Allure.step("Open products page", productsPage::open);
     }
 }

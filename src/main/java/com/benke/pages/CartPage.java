@@ -16,6 +16,9 @@ public class CartPage extends BasePage {
     private final By emptyCartMessage =
             By.xpath("//*[contains(text(),'Cart is empty!')]");
 
+    private final By proceedToCheckoutButton =
+            By.cssSelector("a.check_out");
+
     private By productRowLocator(String productName) {
         return By.xpath(
                 "//table[@id='cart_info_table']//tr[" +
@@ -24,8 +27,24 @@ public class CartPage extends BasePage {
         );
     }
 
+    private final By checkoutLoginPrompt =
+            By.xpath(
+                    "//*[@id='checkoutModal']" +
+                            "//*[contains(text(),'Register / Login account')]"
+            );
+
+    private final By cartProductRows =
+            By.cssSelector("#cart_info_table tbody tr[id^='product-']");
+
+    private final OrderItemsComponent orderItems;
+
     public CartPage(WebDriver driver) {
         super(driver);
+
+        orderItems = new OrderItemsComponent(
+                driver,
+                By.id("cart_info_table")
+        );
     }
 
     public boolean isProductInCart(String productName) {
@@ -47,26 +66,15 @@ public class CartPage extends BasePage {
     }
 
     public int getProductQuantity(String productName) {
-        String quantity = getProductRow(productName)
-                .findElement(By.cssSelector(".cart_quantity button"))
-                .getText()
-                .trim();
-
-        return Integer.parseInt(quantity);
+        return orderItems.getProductQuantity(productName);
     }
 
     public String getProductPrice(String productName) {
-        return getProductRow(productName)
-                .findElement(By.cssSelector(".cart_price p"))
-                .getText()
-                .trim();
+        return orderItems.getProductPrice(productName);
     }
 
     public String getProductTotal(String productName) {
-        return getProductRow(productName)
-                .findElement(By.cssSelector(".cart_total_price"))
-                .getText()
-                .trim();
+        return orderItems.getProductTotal(productName);
     }
 
     public int getCartItemsCount() {
@@ -91,5 +99,34 @@ public class CartPage extends BasePage {
 
     public boolean isCartEmpty() {
         return waitForVisible(emptyCartMessage).isDisplayed();
+    }
+
+    public CheckoutPage proceedToCheckout() {
+        click(proceedToCheckoutButton);
+        return new CheckoutPage(driver);
+    }
+
+    public boolean isLoginRequiredForCheckout() {
+        return waitForVisible(checkoutLoginPrompt).isDisplayed();
+    }
+
+    public void clearCart() {
+
+        while (!driver.findElements(cartProductRows).isEmpty()) {
+
+            WebElement productRow =
+                    driver.findElements(cartProductRows).get(0);
+
+            WebElement removeButton =
+                    productRow.findElement(
+                            By.cssSelector(".cart_quantity_delete")
+                    );
+
+            removeButton.click();
+
+            wait.until(
+                    ExpectedConditions.stalenessOf(productRow)
+            );
+        }
     }
 }
