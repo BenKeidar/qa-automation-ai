@@ -58,4 +58,37 @@ public class SearchProductTest extends BaseTest {
             );
         });
     }
+
+    @Test
+    @Description(
+            "Verifies that searching for a non-existing product " +
+                    "returns no product results."
+    )
+    public void searchForNonExistingProductShouldReturnNoResults() {
+
+        ProductsPage productsPage = new ProductsPage(driver);
+
+        Allure.step("Open products page", productsPage::open);
+
+        Allure.step("Search for non-existing product", () ->
+                productsPage.searchProduct(
+                        TestData.NON_EXISTING_PRODUCT
+                )
+        );
+
+        Allure.step("Verify searched products page is displayed", () ->
+                Assert.assertTrue(
+                        productsPage.isSearchedProductsDisplayed(),
+                        "Searched Products heading was not displayed"
+                )
+        );
+
+        Allure.step("Verify no products are displayed", () ->
+                Assert.assertEquals(
+                        productsPage.getSearchResultsCount(),
+                        0,
+                        "Products were displayed for a non-existing search"
+                )
+        );
+    }
 }

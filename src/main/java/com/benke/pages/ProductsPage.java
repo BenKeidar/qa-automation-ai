@@ -72,6 +72,9 @@ public class ProductsPage extends BasePage {
                 .anyMatch(name -> name.contains(expected));
     }
 
+    private final By productCards =
+            By.cssSelector(".features_items .product-image-wrapper");
+
     public void addProductToCart(String productName) {
         By addToCartButton = By.xpath(
                 "//div[contains(@class,'productinfo')]" +

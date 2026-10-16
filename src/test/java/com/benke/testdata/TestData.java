@@ -6,7 +6,7 @@ public final class TestData {
         // Prevent instantiation
     }
 
-    public static final String SEARCH_KEYWORD_TOP = "top";
+    public static final String NON_EXISTING_PRODUCT = "nonexistentproduct123456";
     public static final String BLUE_TOP = "Blue Top";
     public static final String WINTER_TOP = "Winter Top";
 
