@@ -1,0 +1,55 @@
+
+name: UI Automation Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ui-tests:
+    name: Tests - ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Install browsers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
+
+      - name: Run Selenium tests
+        env:
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          TEST_USER_FULL_NAME: ${{ secrets.TEST_USER_FULL_NAME }}
+        run: mvn -B clean test -Dbrowser=${{ matrix.browser }} -Dheadless=true
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.browser }}
+          path: target/allure-results/
+          if-no-files-found: warn
+
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.browser }}
+          path: target/screenshots/
+          if-no-files-found: ignore

@@ -1,7 +1,11 @@
 package com.benke.base;
 
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import com.benke.listeners.ScreenshotListener;
@@ -14,8 +18,44 @@ public class BaseTest {
 
     @BeforeMethod
     public void setUp() {
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
+
+        String browser = System.getProperty("browser", "chrome");
+        boolean headless = Boolean.parseBoolean(
+                System.getProperty("headless", "false")
+        );
+
+        switch (browser.toLowerCase()) {
+
+            case "chrome":
+                ChromeOptions chromeOptions = new ChromeOptions();
+
+                if (headless) {
+                    chromeOptions.addArguments("--headless=new");
+                }
+
+                chromeOptions.addArguments("--window-size=1920,1080");
+
+                driver = new ChromeDriver(chromeOptions);
+                break;
+
+            case "firefox":
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+
+                if (headless) {
+                    firefoxOptions.addArguments("-headless");
+                }
+
+                driver = new FirefoxDriver(firefoxOptions);
+                driver.manage().window().setSize(
+                        new Dimension(1920, 1080)
+                );
+                break;
+
+            default:
+                throw new IllegalArgumentException(
+                        "Unsupported browser: " + browser
+                );
+        }
     }
 
     public WebDriver getDriver() {

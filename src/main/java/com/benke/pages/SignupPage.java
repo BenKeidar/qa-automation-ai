@@ -114,7 +114,6 @@ public class SignupPage extends BasePage {
     public void deleteAccount() {
         click(deleteAccountLink);
     }
-
     public boolean isAccountDeleted() {
         return waitForVisible(accountDeletedHeading).isDisplayed();
     }
