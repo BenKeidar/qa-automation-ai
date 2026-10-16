@@ -49,6 +49,12 @@ public class BaseTest {
                 driver.manage().window().setSize(
                         new Dimension(1920, 1080)
                 );
+
+                String firefoxBinary = System.getenv("FIREFOX_BINARY");
+
+                if (firefoxBinary != null && !firefoxBinary.isBlank()) {
+                    firefoxOptions.setBinary(firefoxBinary);
+                }
                 break;
 
             default:

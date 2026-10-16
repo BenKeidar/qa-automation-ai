@@ -26,16 +26,28 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Install browsers
+      - name: Install Firefox
+        if: matrix.browser == 'firefox'
         run: |
           sudo apt-get update
-          sudo apt-get install -y firefox
+          sudo apt-get install -y wget bzip2
+          
+          wget -q -O firefox.tar.xz \
+            "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US"
+          
+          sudo mkdir -p /opt/firefox
+          sudo tar -xJf firefox.tar.xz -C /opt/firefox --strip-components=1
+          
+          sudo ln -sf /opt/firefox/firefox /usr/local/bin/firefox
+          
+          /usr/local/bin/firefox --version
 
       - name: Run Selenium tests
         env:
           TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
           TEST_USER_FULL_NAME: ${{ secrets.TEST_USER_FULL_NAME }}
+          FIREFOX_BINARY: /opt/firefox/firefox
         run: mvn -B clean test -Dbrowser=${{ matrix.browser }} -Dheadless=true
 
       - name: Upload Allure results
