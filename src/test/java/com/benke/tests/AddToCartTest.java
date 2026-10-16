@@ -637,11 +637,12 @@ public class AddToCartTest extends BaseTest {
                 )
         );
 
-        Allure.step("Submit payment", paymentPage::submitPayment);
+        OrderConfirmationPage orderConfirmationPage =
+                Allure.step("Submit payment", paymentPage::submitPayment);
 
         Allure.step("Verify order was placed successfully", () ->
                 Assert.assertTrue(
-                        paymentPage.isOrderSuccessful(),
+                        orderConfirmationPage.isOrderPlacedSuccessfully(),
                         "Order confirmation was not displayed"
                 )
         );

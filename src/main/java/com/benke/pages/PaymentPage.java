@@ -26,11 +26,6 @@ public class PaymentPage extends BasePage {
     private final By payAndConfirmButton =
             By.id("submit");
 
-    private final By orderSuccessHeading =
-            By.xpath(
-                    "//*[normalize-space()='Order Placed!']"
-            );
-
     public PaymentPage(WebDriver driver) {
         super(driver);
     }
@@ -54,11 +49,8 @@ public class PaymentPage extends BasePage {
         type(expiryYear, year);
     }
 
-    public void submitPayment() {
+    public OrderConfirmationPage submitPayment() {
         click(payAndConfirmButton);
-    }
-
-    public boolean isOrderSuccessful() {
-        return waitForVisible(orderSuccessHeading).isDisplayed();
+        return new OrderConfirmationPage(driver);
     }
 }
