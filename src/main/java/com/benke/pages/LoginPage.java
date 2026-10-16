@@ -34,8 +34,6 @@ public class LoginPage extends BasePage {
         type(emailInput, email);
         type(passwordInput, password);
         click(loginButton);
-
-        dismissAdIfPresent();
     }
 
     public String getLoginErrorMessage() {

@@ -35,6 +35,7 @@ public class HomePage extends BasePage {
 
     public boolean waitUntilUserLoggedIn() {
         try {
+            handleBlockingAds();
             return wait.until(
                     ExpectedConditions.visibilityOfElementLocated(
                             loggedInUser

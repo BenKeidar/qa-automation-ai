@@ -256,6 +256,7 @@ public class AddToCartTest extends BaseTest {
         });
     }
 
+
     @Test
     @Description(
             "Adds a single product to the cart, removes it, " +
@@ -308,6 +309,7 @@ public class AddToCartTest extends BaseTest {
         });
     }
 
+
     @Test
     @Description(
             "Verifies that a guest user attempting to proceed to checkout " +
@@ -352,6 +354,7 @@ public class AddToCartTest extends BaseTest {
         });
     }
 
+
     @Test
     @Description(
             "Verifies that a logged-in user can proceed from the cart " +
@@ -360,11 +363,15 @@ public class AddToCartTest extends BaseTest {
     public void loggedInUserShouldProceedToCheckout() {
         String email = System.getenv("TEST_USER_EMAIL");
         String password = System.getenv("TEST_USER_PASSWORD");
+        String expectedFullName = System.getenv("TEST_USER_FULL_NAME");
 
         if (email == null || email.isBlank()
-                || password == null || password.isBlank()) {
+                || password == null || password.isBlank()
+                || expectedFullName == null || expectedFullName.isBlank()) {
+
             throw new IllegalStateException(
-                    "Missing test user environment variables"
+                    "Missing required test user environment variables: " +
+                            "TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_FULL_NAME"
             );
         }
 
@@ -457,6 +464,40 @@ public class AddToCartTest extends BaseTest {
                         "Incorrect checkout total amount"
                 )
         );
+
+        Allure.step("Verify delivery and billing addresses are displayed", () -> {
+            Assert.assertTrue(
+                    checkoutPage.isDeliveryAddressDisplayed(),
+                    "Delivery address was not displayed"
+            );
+
+            Assert.assertTrue(
+                    checkoutPage.isBillingAddressDisplayed(),
+                    "Billing address was not displayed"
+            );
+        });
+
+        Allure.step("Verify delivery and billing addresses match", () ->
+                Assert.assertEquals(
+                        checkoutPage.getDeliveryAddressDetails(),
+                        checkoutPage.getBillingAddressDetails(),
+                        "Delivery and billing addresses do not match"
+                )
+        );
+
+        Allure.step("Verify checkout recipient names", () -> {
+            Assert.assertEquals(
+                    checkoutPage.getDeliveryRecipientName(),
+                    expectedFullName,
+                    "Incorrect delivery recipient name"
+            );
+
+            Assert.assertEquals(
+                    checkoutPage.getBillingRecipientName(),
+                    expectedFullName,
+                    "Incorrect billing recipient name"
+            );
+        });
     }
 
     public void cleanTheCart(HomePage homePage, ProductsPage productsPage){
@@ -474,5 +515,135 @@ public class AddToCartTest extends BaseTest {
         });
 
         Allure.step("Open products page", productsPage::open);
+    }
+
+
+    @Test
+    @Description(
+            "Verifies that a logged-in user can add a product to the cart, " +
+                    "review the order, complete payment using test card details, " +
+                    "and receive an order confirmation."
+    )
+    public void loggedInUserShouldPlaceOrderSuccessfully() {
+        String email = System.getenv("TEST_USER_EMAIL");
+        String password = System.getenv("TEST_USER_PASSWORD");
+
+        if (email == null || email.isBlank()
+                || password == null || password.isBlank()) {
+
+            throw new IllegalStateException(
+                    "Missing required test user environment variables: " +
+                            "TEST_USER_EMAIL, TEST_USER_PASSWORD, TEST_USER_FULL_NAME"
+            );
+        }
+
+        ProductsPage productsPage = new ProductsPage(driver);
+        LoginPage loginPage = new LoginPage(driver);
+        HomePage homePage = new HomePage(driver);
+
+        String productName = "Blue Top";
+
+        Allure.step("Open login page", loginPage::open);
+
+        Allure.step("Login with valid test user", () -> {
+            loginPage.login(email, password);
+        });
+
+        Allure.step("Verify user is logged in", () -> {
+            Assert.assertTrue(
+                    homePage.waitUntilUserLoggedIn(),
+                    "User was not logged in"
+            );
+        });
+
+        cleanTheCart(homePage, productsPage);
+
+        Allure.step("Search for " + productName, () -> {
+            productsPage.searchProduct(productName);
+        });
+
+        String expectedPrice = Allure.step(
+                "Get product price before checkout",
+                () -> productsPage.getProductPrice(productName)
+        );
+
+        Allure.step("Add product to cart", () -> {
+            productsPage.addProductMultipleTimes(productName, 1);
+        });
+
+        CartPage cartPage = Allure.step(
+                "Open cart from header",
+                homePage::openCartFromHeader
+        );
+
+        Allure.step("Verify product is in cart", () -> {
+            Assert.assertTrue(
+                    cartPage.isProductInCart(productName),
+                    productName + " was not found in cart"
+            );
+        });
+
+        CheckoutPage checkoutPage = Allure.step(
+                "Proceed to checkout",
+                cartPage::proceedToCheckout
+        );
+
+        Allure.step("Verify checkout page is displayed", () ->
+                Assert.assertTrue(
+                        checkoutPage.isAddressDetailsDisplayed(),
+                        "Checkout page was not displayed"
+                )
+        );
+
+        Allure.step("Verify order details before payment", () -> {
+            Assert.assertEquals(
+                    checkoutPage.getOrderItems().getProductQuantity(productName),
+                    1,
+                    "Incorrect product quantity"
+            );
+
+            Assert.assertEquals(
+                    checkoutPage.getOrderItems().getProductPrice(productName),
+                    expectedPrice,
+                    "Incorrect product price"
+            );
+
+            Assert.assertEquals(
+                    checkoutPage.getTotalAmount(),
+                    expectedPrice,
+                    "Incorrect order total"
+            );
+        });
+
+        PaymentPage paymentPage = Allure.step(
+                "Proceed to payment",
+                checkoutPage::placeOrder
+        );
+
+        Allure.step("Verify payment page is displayed", () ->
+                Assert.assertTrue(
+                        paymentPage.isPaymentPageDisplayed(),
+                        "Payment page was not displayed"
+                )
+        );
+
+        Allure.step("Enter test payment details", () ->
+                paymentPage.enterPaymentDetails(
+                        "Test User",
+                        "4111111111111111",
+                        "123",
+                        "12",
+                        "2030"
+                )
+        );
+
+        Allure.step("Submit payment", paymentPage::submitPayment);
+
+        Allure.step("Verify order was placed successfully", () ->
+                Assert.assertTrue(
+                        paymentPage.isOrderSuccessful(),
+                        "Order confirmation was not displayed"
+                )
+        );
     }
 }

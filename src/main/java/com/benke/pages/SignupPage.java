@@ -65,11 +65,10 @@ public class SignupPage extends BasePage {
         type(signupName, name);
         type(signupEmail, email);
         click(signupButton);
-
-        dismissAdIfPresent();
     }
 
     public boolean isAccountInformationDisplayed() {
+        handleBlockingAds();
         return waitForVisible(accountInformationHeading).isDisplayed();
     }
 
@@ -101,37 +100,15 @@ public class SignupPage extends BasePage {
     }
 
     public void createAccount() {
-        try {
-            clickCreateAccount();
-        } catch (ElementClickInterceptedException e) {
-            dismissAdIfPresent();
-            clickCreateAccount();
-        }
-    }
-
-    public void clickCreateAccount() {
-        WebElement button = waitForVisible(createAccountButton);
-
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].scrollIntoView({block: 'center'});",
-                button
-        );
-
         click(createAccountButton);
     }
-
 
     public boolean isAccountCreated() {
         return waitForVisible(accountCreatedHeading).isDisplayed();
     }
 
     public void continueAfterRegistration() {
-        try {
-            click(continueButton);
-        } catch (ElementClickInterceptedException e) {
-            dismissAdIfPresent();
-            click(continueButton);
-        }
+        click(continueButton);
     }
 
     public void deleteAccount() {

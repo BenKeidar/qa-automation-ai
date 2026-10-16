@@ -1,17 +1,11 @@
 
 package com.benke.pages;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.ElementClickInterceptedException;
-import org.openqa.selenium.StaleElementReferenceException;
+
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.List;
@@ -44,7 +38,27 @@ public class BasePage {
     }
 
     protected void click(By locator) {
-        waitForClickable(locator).click();
+        WebElement element = waitForClickable(locator);
+
+        scrollToCenter(element);
+
+        try {
+            element.click();
+        } catch (ElementClickInterceptedException e) {
+            handleBlockingAds();
+
+            WebElement retryElement = waitForClickable(locator);
+            scrollToCenter(retryElement);
+
+            retryElement.click();
+        }
+    }
+
+    private void scrollToCenter(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center'});",
+                element
+        );
     }
 
     protected void type(By locator, String text) {
@@ -90,4 +104,20 @@ public class BasePage {
         }
     }
 
+    protected void hideAnchorAds() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        js.executeScript("""
+        document.querySelectorAll(
+            'ins.adsbygoogle.adsbygoogle-noablate'
+        ).forEach(ad => {
+            ad.style.setProperty('display', 'none', 'important');
+        });
+    """);
+    }
+
+    protected void handleBlockingAds() {
+        dismissAdIfPresent();
+        hideAnchorAds();
+    }
 }
