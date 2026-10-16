@@ -5,6 +5,7 @@ import com.benke.base.BaseTest;
 import com.benke.pages.HomePage;
 import com.benke.pages.LoginPage;
 import com.benke.pages.SignupPage;
+import com.benke.testdata.TestData;
 import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import org.testng.Assert;
@@ -36,10 +37,13 @@ public class SignupTest extends BaseTest {
         loginPage = new LoginPage(driver);
         homePage = new HomePage(driver);
 
-        String name = "Automation Tester";
-        testEmail = "qa.test." +
-                UUID.randomUUID() + "@example.com";
-        testPassword = "TestPassword123!";
+        String name = TestData.SIGNUP_NAME;
+
+        testEmail = TestData.SIGNUP_EMAIL_PREFIX
+                + UUID.randomUUID()
+                + TestData.SIGNUP_EMAIL_DOMAIN;
+
+        testPassword = TestData.SIGNUP_PASSWORD;
 
         Allure.step("Open signup page", signupPage::open);
 

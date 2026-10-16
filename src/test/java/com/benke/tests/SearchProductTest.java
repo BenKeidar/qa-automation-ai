@@ -3,6 +3,7 @@ package com.benke.tests;
 
 import com.benke.base.BaseTest;
 import com.benke.pages.ProductsPage;
+import com.benke.testdata.TestData;
 import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import org.testng.Assert;
@@ -19,7 +20,7 @@ public class SearchProductTest extends BaseTest {
     public void searchProductShouldReturnMatchingResults() {
 
         ProductsPage productsPage = new ProductsPage(driver);
-        String keyword = "top";
+        String keyword = TestData.SEARCH_KEYWORD_TOP;
 
         Allure.step("Open products page", productsPage::open);
 

@@ -4,7 +4,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 public class ProductsPage extends BasePage {
@@ -29,6 +32,8 @@ public class ProductsPage extends BasePage {
     private final By continueShoppingButton =
             By.cssSelector("#cartModal button.close-modal");
 
+    private final By cartModal = By.id("cartModal");
+
     public ProductsPage(WebDriver driver) {
         super(driver);
     }
@@ -39,10 +44,6 @@ public class ProductsPage extends BasePage {
 
     public boolean areProductsDisplayed() {
         return waitForVisible(productsList).isDisplayed();
-    }
-
-    public int getProductsCount() {
-        return driver.findElements(productsList).size();
     }
 
     public void searchProduct(String productName) {
@@ -71,7 +72,6 @@ public class ProductsPage extends BasePage {
                 .anyMatch(name -> name.contains(expected));
     }
 
-
     public void addProductToCart(String productName) {
         By addToCartButton = By.xpath(
                 "//div[contains(@class,'productinfo')]" +
@@ -79,14 +79,7 @@ public class ProductsPage extends BasePage {
                         "//a[contains(@class,'add-to-cart')]"
         );
 
-        WebElement button = waitForClickable(addToCartButton);
-
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].scrollIntoView({block:'center'});",
-                button
-        );
-
-        button.click();
+        click(addToCartButton);
     }
 
     public void addProductMultipleTimes(String productName, int quantity) {
@@ -114,7 +107,12 @@ public class ProductsPage extends BasePage {
     }
 
     public void continueShopping() {
+        waitForVisible(cartModal);
+
         click(continueShoppingButton);
+
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.invisibilityOfElementLocated(cartModal));
     }
 
     public CartPage viewCart() {

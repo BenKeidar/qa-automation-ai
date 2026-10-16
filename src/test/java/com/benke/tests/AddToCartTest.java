@@ -2,6 +2,7 @@ package com.benke.tests;
 
 import com.benke.base.BaseTest;
 import com.benke.pages.*;
+import com.benke.testdata.TestData;
 import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import org.testng.Assert;
@@ -20,7 +21,7 @@ public class AddToCartTest extends BaseTest {
     public void addProductToCartShouldSucceed() {
 
         ProductsPage productsPage = new ProductsPage(driver);
-        String productName = "Blue Top";
+        String productName = TestData.BLUE_TOP;
 
         Allure.step("Open products page", productsPage::open);
 
@@ -88,8 +89,8 @@ public class AddToCartTest extends BaseTest {
         HomePage homePage = new HomePage(driver);
 
         Map<String, Integer> expectedQuantities = new LinkedHashMap<>();
-        expectedQuantities.put("Blue Top", 2);
-        expectedQuantities.put("Winter Top", 1);
+        expectedQuantities.put(TestData.BLUE_TOP, 2);
+        expectedQuantities.put(TestData.WINTER_TOP, 1);
 
         Map<String, String> expectedPrices = new LinkedHashMap<>();
 
@@ -192,8 +193,8 @@ public class AddToCartTest extends BaseTest {
         ProductsPage productsPage = new ProductsPage(driver);
         HomePage homePage = new HomePage(driver);
 
-        String productToRemove = "Blue Top";
-        String productToKeep = "Winter Top";
+        String productToRemove = TestData.BLUE_TOP;
+        String productToKeep = TestData.WINTER_TOP;
 
         Allure.step("Open products page", productsPage::open);
 
@@ -267,7 +268,7 @@ public class AddToCartTest extends BaseTest {
         ProductsPage productsPage = new ProductsPage(driver);
         HomePage homePage = new HomePage(driver);
 
-        String productName = "Blue Top";
+        String productName = TestData.BLUE_TOP;;
 
         Allure.step("Open products page", productsPage::open);
 
@@ -320,7 +321,7 @@ public class AddToCartTest extends BaseTest {
         ProductsPage productsPage = new ProductsPage(driver);
         HomePage homePage = new HomePage(driver);
 
-        String productName = "Blue Top";
+        String productName = TestData.BLUE_TOP;;
 
         Allure.step("Open products page", productsPage::open);
 
@@ -379,7 +380,7 @@ public class AddToCartTest extends BaseTest {
         LoginPage loginPage = new LoginPage(driver);
         HomePage homePage = new HomePage(driver);
 
-        String productName = "Blue Top";
+        String productName = TestData.BLUE_TOP;;
 
         Allure.step("Open login page", loginPage::open);
 
@@ -629,11 +630,11 @@ public class AddToCartTest extends BaseTest {
 
         Allure.step("Enter test payment details", () ->
                 paymentPage.enterPaymentDetails(
-                        "Test User",
-                        "4111111111111111",
-                        "123",
-                        "12",
-                        "2030"
+                        TestData.CARD_HOLDER,
+                        TestData.CARD_NUMBER,
+                        TestData.CARD_CVC,
+                        TestData.CARD_EXPIRY_MONTH,
+                        TestData.CARD_EXPIRY_YEAR
                 )
         );
 
