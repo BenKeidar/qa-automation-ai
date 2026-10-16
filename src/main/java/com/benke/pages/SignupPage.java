@@ -77,21 +77,15 @@ public class SignupPage extends BasePage {
         click(titleMr);
         type(passwordInput, password);
 
-        new Select(waitForVisible(daySelect))
-                .selectByVisibleText("10");
-
-        new Select(waitForVisible(monthSelect))
-                .selectByVisibleText("May");
-
-        new Select(waitForVisible(yearSelect))
-                .selectByVisibleText("1995");
+        selectByVisibleText(daySelect, "10");
+        selectByVisibleText(monthSelect, "May");
+        selectByVisibleText(yearSelect, "1995");
 
         type(firstNameInput, "Automation");
         type(lastNameInput, "Tester");
         type(addressInput, "123 Test Street");
 
-        new Select(waitForVisible(countrySelect))
-                .selectByVisibleText("United States");
+        selectByVisibleText(countrySelect, "United States");
 
         type(stateInput, "California");
         type(cityInput, "Los Angeles");

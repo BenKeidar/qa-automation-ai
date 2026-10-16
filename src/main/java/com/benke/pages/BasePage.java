@@ -3,6 +3,7 @@ package com.benke.pages;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
@@ -51,6 +52,23 @@ public class BasePage {
             scrollToCenter(retryElement);
 
             retryElement.click();
+        }
+    }
+
+    protected void selectByVisibleText(By locator, String text) {
+        WebElement dropdown = waitForVisible(locator);
+        scrollToCenter(dropdown);
+
+        try {
+            new Select(dropdown).selectByVisibleText(text);
+
+        } catch (ElementClickInterceptedException e) {
+            handleBlockingAds();
+
+            dropdown = waitForVisible(locator);
+            scrollToCenter(dropdown);
+
+            new Select(dropdown).selectByVisibleText(text);
         }
     }
 
