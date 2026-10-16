@@ -93,6 +93,7 @@ public class SignupTest extends BaseTest {
     @AfterMethod(alwaysRun = true)
     public void cleanupTestAccount() {
         System.out.println("1 - SignupTest cleanup started");
+
         if (!registrationSubmitted || signupPage == null) {
             return;
         }
@@ -121,9 +122,25 @@ public class SignupTest extends BaseTest {
         Allure.step("Cleanup: Delete test account", () -> {
             signupPage.deleteAccount();
 
-            Assert.assertTrue(
-                    signupPage.isAccountDeleted(),
-                    "Cleanup failed: Test account was not deleted"
+            if (signupPage.isAccountDeleted()) {
+                return;
+            }
+
+            if (signupPage.isServerError520Displayed()) {
+                Allure.attachment(
+                        "Cleanup warning",
+                        "Account deletion could not be confirmed because the website returned Cloudflare 520."
+                );
+
+                System.err.println(
+                        "WARNING: Cleanup could not confirm account deletion due to server error 520."
+                );
+
+                return;
+            }
+
+            Assert.fail(
+                    "Cleanup failed: Account deletion was not confirmed, and no Cloudflare 520 error was detected."
             );
         });
     }

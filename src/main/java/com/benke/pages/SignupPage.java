@@ -108,8 +108,13 @@ public class SignupPage extends BasePage {
     public void deleteAccount() {
         click(deleteAccountLink);
     }
+
     public boolean isAccountDeleted() {
-        return waitForVisible(accountDeletedHeading).isDisplayed();
+        try {
+            return waitForVisible(accountDeletedHeading).isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public boolean waitForRegistrationResult() {
@@ -131,4 +136,7 @@ public class SignupPage extends BasePage {
                 .anyMatch(element -> element.isDisplayed());
     }
 
+    public boolean isServerError520Displayed() {
+        return driver.getPageSource().contains("Error code 520");
+    }
 }
