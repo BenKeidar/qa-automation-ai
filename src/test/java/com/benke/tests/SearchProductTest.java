@@ -7,20 +7,29 @@ import com.benke.testdata.TestData;
 import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class SearchProductTest extends BaseTest {
+    @DataProvider(name = "productSearchKeywords")
+    public Object[][] productSearchKeywords() {
+        return new Object[][]{
+                {"top"},
+                {"dress"},
+                {"jeans"}
+        };
+    }
 
-    @Test
+
+    @Test(dataProvider = "productSearchKeywords")
     @Description(
             "Verifies that searching for a product displays the " +
                     "Searched Products section and returns results containing " +
                     "at least one product matching the search keyword."
     )
-    public void searchProductShouldReturnMatchingResults() {
+    public void searchProductShouldReturnMatchingResults(String keyword) {
 
         ProductsPage productsPage = new ProductsPage(driver);
-        String keyword = TestData.SEARCH_KEYWORD_TOP;
 
         Allure.step("Open products page", productsPage::open);
 
